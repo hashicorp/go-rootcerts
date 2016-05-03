@@ -19,3 +19,23 @@ System and Login keychains from being loaded][1]. This library contains
 Darwin-specific behavior that works around that bug.
 
 [1]: https://github.com/golang/go/issues/14514
+
+## Example Usage
+
+Here's a snippet demonstrating how this library is meant to be used:
+
+```go
+func httpClient() (*http.Client, error)
+	tlsConfig := &tls.Config{}
+	err := rootcerts.ConfigureTLS(tlsConfig, &rootcerts.Config{
+		CAFile: os.Getenv("MYAPP_CAFILE"),
+		CAPath: os.Getenv("MYAPP_CAPATH"),
+	})
+	if err != nil {
+		return nil, err
+	}
+	c := cleanhttp.DefaultClient()
+	c.Transport.TLSClientConfig = tlsConfig
+	return c, nil
+}
+```
