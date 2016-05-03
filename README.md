@@ -35,7 +35,9 @@ func httpClient() (*http.Client, error)
 		return nil, err
 	}
 	c := cleanhttp.DefaultClient()
-	c.Transport.TLSClientConfig = tlsConfig
+	t := cleanhttp.DefaultTransport()
+	t.TLSClientConfig = tlsConfig
+	c.Transport = t
 	return c, nil
 }
 ```
