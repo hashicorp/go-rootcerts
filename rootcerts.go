@@ -22,9 +22,9 @@ type Config struct {
 	CAPath string
 }
 
-// ConfigureCACerts sets up the RootCAs on the provided tls.Config based on the
+// ConfigureTLS sets up the RootCAs on the provided tls.Config based on the
 // Config specified.
-func ConfigureCACerts(t *tls.Config, c *Config) error {
+func ConfigureTLS(t *tls.Config, c *Config) error {
 	pool, err := LoadCACerts(c)
 	if err != nil {
 		return err
