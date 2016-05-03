@@ -12,10 +12,10 @@ certificates.
 This library contains utility functions for loading certificates destined for
 that field, as well as one other important thing:
 
-When this field is `nil`, the library attempts to load the host's root CA set.
-This behavior is OS-specific, and the Darwin implementation contains [a bug
-that prevents trusted certificates from the System and Login keychains from
-being loaded][1]. This library contains Darwin-specific behavior that works
-around that bug.
+When the `RootCAs` field is `nil`, the standard library attempts to load the
+host's root CA set.  This behavior is OS-specific, and the Darwin
+implementation contains [a bug that prevents trusted certificates from the
+System and Login keychains from being loaded][1]. This library contains
+Darwin-specific behavior that works around that bug.
 
 [1]: https://github.com/golang/go/issues/14514
