@@ -40,7 +40,7 @@ func certKeychains() []string {
 		"/Library/Keychains/System.keychain",
 	}
 	home, err := homedir.Dir()
-	if err != nil {
+	if err == nil {
 		loginKeychain := path.Join(home, "Library", "Keychains", "login.keychain")
 		keychains = append(keychains, loginKeychain)
 	}

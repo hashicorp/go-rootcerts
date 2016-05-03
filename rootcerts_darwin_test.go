@@ -8,3 +8,10 @@ func TestSystemCAsOnDarwin(t *testing.T) {
 		t.Fatalf("Got error: %s", err)
 	}
 }
+
+func TestCertKeychains(t *testing.T) {
+	keychains := certKeychains()
+	if len(keychains) != 3 {
+		t.Fatalf("Expected 3 keychains, got %#v", keychains)
+	}
+}
