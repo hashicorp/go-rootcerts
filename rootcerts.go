@@ -25,6 +25,9 @@ type Config struct {
 // ConfigureTLS sets up the RootCAs on the provided tls.Config based on the
 // Config specified.
 func ConfigureTLS(t *tls.Config, c *Config) error {
+	if t == nil {
+		return nil
+	}
 	pool, err := LoadCACerts(c)
 	if err != nil {
 		return err
@@ -35,6 +38,9 @@ func ConfigureTLS(t *tls.Config, c *Config) error {
 
 // LoadCACerts loads a CertPool based on the Config specified.
 func LoadCACerts(c *Config) (*x509.CertPool, error) {
+	if c == nil {
+		c = &Config{}
+	}
 	if c.CAFile != "" {
 		return LoadCAFile(c.CAFile)
 	}
