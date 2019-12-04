@@ -30,7 +30,7 @@ func httpClient() (*http.Client, error)
 	err := rootcerts.ConfigureTLS(tlsConfig, &rootcerts.Config{
 		CAFile:      os.Getenv("MYAPP_CAFILE"),
 		CAPath:      os.Getenv("MYAPP_CAPATH"),
-        Certificate: os.Getenv("MYAPP_CERTIFICATE"),
+		Certificate: os.Getenv("MYAPP_CERTIFICATE"),
 	})
 	if err != nil {
 		return nil, err
