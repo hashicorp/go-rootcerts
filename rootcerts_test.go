@@ -1,6 +1,7 @@
 package rootcerts
 
 import (
+	"io/ioutil"
 	"path/filepath"
 	"testing"
 )
@@ -24,6 +25,18 @@ func TestLoadCACertsHandlesNil(t *testing.T) {
 func TestLoadCACertsFromFile(t *testing.T) {
 	path := testFixture("cafile", "cacert.pem")
 	_, err := LoadCACerts(&Config{CAFile: path})
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+}
+
+func TestLoadCACertsInMem(t *testing.T) {
+	path := testFixture("cafile", "cacert.pem")
+	pem, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("err : %s", err)
+	}
+	_, err = LoadCACerts(&Config{Certificate: string(pem[:])})
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}

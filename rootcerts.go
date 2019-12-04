@@ -3,6 +3,7 @@ package rootcerts
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -15,8 +16,11 @@ import (
 // Go's standard library to load system certs.
 type Config struct {
 	// CAFile is a path to a PEM-encoded certificate file or bundle. Takes
-	// precedence over CAPath.
+	// precedence over Certificate and CAPath.
 	CAFile string
+
+	// Certificate is a PEM-encoded certificate. Takes precedence over CAPath.
+	Certificate string
 
 	// CAPath is a path to a directory populated with PEM-encoded certificates.
 	CAPath string
@@ -44,6 +48,9 @@ func LoadCACerts(c *Config) (*x509.CertPool, error) {
 	if c.CAFile != "" {
 		return LoadCAFile(c.CAFile)
 	}
+	if c.Certificate != "" {
+		return AppendCertificate(c.Certificate)
+	}
 	if c.CAPath != "" {
 		return LoadCAPath(c.CAPath)
 	}
@@ -63,6 +70,18 @@ func LoadCAFile(caFile string) (*x509.CertPool, error) {
 	ok := pool.AppendCertsFromPEM(pem)
 	if !ok {
 		return nil, fmt.Errorf("Error loading CA File: Couldn't parse PEM in: %s", caFile)
+	}
+
+	return pool, nil
+}
+
+// AppendCertificate appends an in-memory PEM-encoded certificate and returns a cert-pool.
+func AppendCertificate(ca string) (*x509.CertPool, error) {
+	pool := x509.NewCertPool()
+
+	ok := pool.AppendCertsFromPEM([]byte(ca))
+	if !ok {
+		return nil, errors.New("Error appending CA: Couldn't parse PEM")
 	}
 
 	return pool, nil
