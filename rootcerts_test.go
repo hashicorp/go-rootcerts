@@ -36,7 +36,7 @@ func TestLoadCACertsInMem(t *testing.T) {
 	if err != nil {
 		t.Fatalf("err : %s", err)
 	}
-	_, err = LoadCACerts(&Config{Certificate: string(pem[:])})
+	_, err = LoadCACerts(&Config{CACertificate: pem})
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
