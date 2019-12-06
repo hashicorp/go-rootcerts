@@ -16,7 +16,7 @@ import (
 // Go's standard library to load system certs.
 type Config struct {
 	// CAFile is a path to a PEM-encoded certificate file or bundle. Takes
-	// precedence over Certificate and CAPath.
+	// precedence over CACertificate and CAPath.
 	CAFile string
 
 	// CACertificate is a PEM-encoded certificate or bundle. Takes precedence
