@@ -2,10 +2,11 @@ package rootcerts
 
 import (
 	"crypto/x509"
+	"fmt"
 	"os/exec"
 	"path"
 
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 )
 
 // LoadSystemCAs has special behavior on Darwin systems to work around
@@ -29,7 +30,10 @@ func addCertsFromKeychain(pool *x509.CertPool, keychain string) error {
 		return err
 	}
 
-	pool.AppendCertsFromPEM(data)
+	if ok := pool.AppendCertsFromPEM(data); !ok {
+		// https://github.com/golang/go/issues/23711
+		return fmt.Errorf("Failed to add cert from %s. Is the common name a DNS compatible name?", keychain)
+	}
 
 	return nil
 }
