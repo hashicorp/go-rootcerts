@@ -48,6 +48,23 @@ func TestLoadCACertsInMem(t *testing.T) {
 	testCertLoaded(t, p)
 }
 
+func TestLoadCACertsFromCertPool(t *testing.T) {
+	path := testFixture("cafile", "cacert.pem")
+	pem, err := ioutil.ReadFile(path)
+	if err != nil {
+		t.Fatalf("err : %s", err)
+	}
+
+	certPool := x509.NewCertPool()
+	certPool.AppendCertsFromPEM(pem)
+
+	p, err := LoadCACerts(&Config{CACertPool: certPool})
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	testCertLoaded(t, p)
+}
+
 func TestLoadCACertsFromDir(t *testing.T) {
 	path := testFixture("capath")
 	p, err := LoadCACerts(&Config{CAPath: path})
