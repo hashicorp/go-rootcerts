@@ -11,13 +11,17 @@ import (
 )
 
 // Config determines where LoadCACerts will load certificates from. When CAFile,
-// CACertificate and CAPath are blank, this library's functions will either load
-// system roots explicitly and return them, or set the CertPool to nil to allow
-// Go's standard library to load system certs.
+// CACertPool, CACertificate and CAPath are blank, this library's functions will
+// either load system roots explicitly and return them, or set the CertPool to nil
+// to allow Go's standard library to load system certs.
 type Config struct {
 	// CAFile is a path to a PEM-encoded certificate file or bundle. Takes
 	// precedence over CACertificate and CAPath.
 	CAFile string
+
+	// CACertPool is a set of certificates. Takes precedence over CACertificate
+	// and CAPath.
+	CACertPool *x509.CertPool
 
 	// CACertificate is a PEM-encoded certificate or bundle. Takes precedence
 	// over CAPath.
@@ -48,6 +52,9 @@ func LoadCACerts(c *Config) (*x509.CertPool, error) {
 	}
 	if c.CAFile != "" {
 		return LoadCAFile(c.CAFile)
+	}
+	if c.CACertPool != nil {
+		return c.CACertPool, nil
 	}
 	if len(c.CACertificate) != 0 {
 		return AppendCertificate(c.CACertificate)
