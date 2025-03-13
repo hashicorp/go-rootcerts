@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 )
@@ -37,7 +37,7 @@ func TestLoadCACertsFromFile(t *testing.T) {
 
 func TestLoadCACertsInMem(t *testing.T) {
 	path := testFixture("cafile", "cacert.pem")
-	pem, err := ioutil.ReadFile(path)
+	pem, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("err : %s", err)
 	}
