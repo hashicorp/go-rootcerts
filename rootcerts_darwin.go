@@ -2,10 +2,9 @@ package rootcerts
 
 import (
 	"crypto/x509"
+	"os"
 	"os/exec"
 	"path"
-
-	"github.com/mitchellh/go-homedir"
 )
 
 // LoadSystemCAs has special behavior on Darwin systems to work around
@@ -39,7 +38,7 @@ func certKeychains() []string {
 		"/System/Library/Keychains/SystemRootCertificates.keychain",
 		"/Library/Keychains/System.keychain",
 	}
-	home, err := homedir.Dir()
+	home, err := os.UserHomeDir()
 	if err == nil {
 		loginKeychain := path.Join(home, "Library", "Keychains", "login.keychain")
 		keychains = append(keychains, loginKeychain)
