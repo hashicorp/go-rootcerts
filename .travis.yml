@@ -6,7 +6,7 @@ sudo: false
 language: go
 
 go:
-  - 1.6
+  - 1.23
 
 branches:
   only:
