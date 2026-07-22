@@ -90,7 +90,7 @@ func AppendCertificate(ca []byte) (*x509.CertPool, error) {
 	return pool, nil
 }
 
-// LoadCAPath walks the provided path and loads all certificates encounted into
+// LoadCAPath walks the provided path and loads all certificates encountered into
 // a pool.
 func LoadCAPath(caPath string) (*x509.CertPool, error) {
 	pool := x509.NewCertPool()
