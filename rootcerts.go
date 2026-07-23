@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Config determines where LoadCACerts will load certificates from. When CAFile,
@@ -63,6 +64,10 @@ func LoadCACerts(c *Config) (*x509.CertPool, error) {
 
 // LoadCAFile loads a single PEM-encoded file from the path specified.
 func LoadCAFile(caFile string) (*x509.CertPool, error) {
+	caFile = strings.TrimSpace(caFile)
+	if caFile == "" {
+		return nil, fmt.Errorf("Error loading CA File: path is empty")
+	}
 	pool := x509.NewCertPool()
 
 	pem, err := os.ReadFile(caFile)
@@ -93,6 +98,10 @@ func AppendCertificate(ca []byte) (*x509.CertPool, error) {
 // LoadCAPath walks the provided path and loads all certificates encounted into
 // a pool.
 func LoadCAPath(caPath string) (*x509.CertPool, error) {
+	caPath = strings.TrimSpace(caPath)
+	if caPath == "" {
+		return nil, fmt.Errorf("Error loading CA Path: path is empty")
+	}
 	pool := x509.NewCertPool()
 	walkFn := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
