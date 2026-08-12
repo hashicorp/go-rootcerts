@@ -13,7 +13,7 @@ import (
 )
 
 const fixturesDir = "./test-fixtures"
-const caCertSHA256Sum = "e85d9f94f730878cc1a516d9486fdb0255452b37961f325af9fc851cc4689311"
+const caCertSHA256Sum = "3c5f36ae5aa84b9fa595b3bc62a1f2f2958139daa367923818dc9cfb79ff7484"
 
 func TestConfigureTLSHandlesNil(t *testing.T) {
 	err := ConfigureTLS(nil, nil)
