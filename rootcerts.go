@@ -90,8 +90,9 @@ func AppendCertificate(ca []byte) (*x509.CertPool, error) {
 	return pool, nil
 }
 
-// LoadCAPath walks the provided path and loads all certificates encounted into
-// a pool.
+// LoadCAPath walks the provided path and loads all certificates encountered into
+// a pool. Symbolic links to directories (for example Kubernetes ConfigMap
+// volume mounts) are skipped; symbolic links to files are followed.
 func LoadCAPath(caPath string) (*x509.CertPool, error) {
 	pool := x509.NewCertPool()
 	walkFn := func(path string, info os.FileInfo, err error) error {
@@ -101,6 +102,20 @@ func LoadCAPath(caPath string) (*x509.CertPool, error) {
 
 		if info.IsDir() {
 			return nil
+		}
+
+		// filepath.Walk does not follow directory symlinks, but it still
+		// reports them as non-directories. Kubernetes ConfigMap/Secret mounts
+		// include a "..data" symlink to a directory; skip those instead of
+		// trying to parse them as PEM.
+		if info.Mode()&os.ModeSymlink != 0 {
+			target, err := os.Stat(path)
+			if err != nil {
+				return fmt.Errorf("Error loading file from CAPath: %s", err)
+			}
+			if !target.Mode().IsRegular() {
+				return nil
+			}
 		}
 
 		pem, err := os.ReadFile(path)

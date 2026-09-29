@@ -69,6 +69,42 @@ func TestLoadCACertsFromDirWithSymlinks(t *testing.T) {
 	testCertLoaded(t, p)
 }
 
+// Kubernetes ConfigMap/Secret volume mounts look like:
+//
+//	ca.pem -> ..data/ca.pem
+//	..data -> ..2024_01_02_03_04_05   (symlink to a directory)
+//	..2024_01_02_03_04_05/ca.pem
+//
+// LoadCAPath must skip the directory symlink instead of treating it as a PEM file.
+func TestLoadCACertsFromDirWithDirectorySymlinks(t *testing.T) {
+	dir := t.TempDir()
+
+	pem, err := os.ReadFile(testFixture("cafile", "cacert.pem"))
+	if err != nil {
+		t.Fatalf("read fixture: %s", err)
+	}
+
+	realDir := filepath.Join(dir, "..2024_01_02_03_04_05")
+	if err := os.Mkdir(realDir, 0o755); err != nil {
+		t.Fatalf("mkdir: %s", err)
+	}
+	if err := os.WriteFile(filepath.Join(realDir, "ca.pem"), pem, 0o644); err != nil {
+		t.Fatalf("write cert: %s", err)
+	}
+	if err := os.Symlink("..2024_01_02_03_04_05", filepath.Join(dir, "..data")); err != nil {
+		t.Fatalf("symlink dir: %s", err)
+	}
+	if err := os.Symlink(filepath.Join("..data", "ca.pem"), filepath.Join(dir, "ca.pem")); err != nil {
+		t.Fatalf("symlink file: %s", err)
+	}
+
+	p, err := LoadCACerts(&Config{CAPath: dir})
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	testCertLoaded(t, p)
+}
+
 func testFixture(n ...string) string {
 	parts := []string{fixturesDir}
 	parts = append(parts, n...)
