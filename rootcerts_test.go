@@ -61,8 +61,25 @@ func TestLoadCACertsFromDir(t *testing.T) {
 }
 
 func TestLoadCACertsFromDirWithSymlinks(t *testing.T) {
-	path := testFixture("capath-with-symlinks")
-	p, err := LoadCACerts(&Config{CAPath: path})
+	tempDir := t.TempDir()
+
+	securetrustPath, err := filepath.Abs(testFixture("capath", "securetrust.pem"))
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	thawtePath, err := filepath.Abs(testFixture("capath", "thawte.pem"))
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	if err := os.Symlink(securetrustPath, filepath.Join(tempDir, "securetrust.pem")); err != nil {
+		t.Skipf("skipping test; symlinks not supported: %s", err)
+	}
+	if err := os.Symlink(thawtePath, filepath.Join(tempDir, "thawte.pem")); err != nil {
+		t.Fatalf("err: %s", err)
+	}
+
+	p, err := LoadCACerts(&Config{CAPath: tempDir})
 	if err != nil {
 		t.Fatalf("err: %s", err)
 	}
