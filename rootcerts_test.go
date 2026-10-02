@@ -69,6 +69,35 @@ func TestLoadCACertsFromDirWithSymlinks(t *testing.T) {
 	testCertLoaded(t, p)
 }
 
+func TestLoadCACertsFromDirWithNonCertFiles(t *testing.T) {
+	path := testFixture("capath-with-non-certs")
+	p, err := LoadCACerts(&Config{CAPath: path})
+	if err != nil {
+		t.Fatalf("err: %s", err)
+	}
+	testCertLoaded(t, p)
+	if len(p.Subjects()) != 2 {
+		t.Fatalf("expected 2 certificates loaded, got %d", len(p.Subjects()))
+	}
+}
+
+func TestLoadCACertsFromDirNoCerts(t *testing.T) {
+	path := testFixture("capath-no-certs")
+	_, err := LoadCACerts(&Config{CAPath: path})
+	if err == nil {
+		t.Fatal("expected error when no certificates found in CAPath, got nil")
+	}
+}
+
+func TestLoadCACertsFromDirEmpty(t *testing.T) {
+	dir := t.TempDir()
+	_, err := LoadCACerts(&Config{CAPath: dir})
+	if err == nil {
+		t.Fatal("expected error when CAPath is empty, got nil")
+	}
+}
+
+
 func testFixture(n ...string) string {
 	parts := []string{fixturesDir}
 	parts = append(parts, n...)

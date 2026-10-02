@@ -90,10 +90,11 @@ func AppendCertificate(ca []byte) (*x509.CertPool, error) {
 	return pool, nil
 }
 
-// LoadCAPath walks the provided path and loads all certificates encounted into
-// a pool.
+// LoadCAPath walks the provided path and loads all certificates encountered into
+// a pool. Non-certificate files are skipped.
 func LoadCAPath(caPath string) (*x509.CertPool, error) {
 	pool := x509.NewCertPool()
+	var certsLoaded int
 	walkFn := func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -108,9 +109,8 @@ func LoadCAPath(caPath string) (*x509.CertPool, error) {
 			return fmt.Errorf("Error loading file from CAPath: %s", err)
 		}
 
-		ok := pool.AppendCertsFromPEM(pem)
-		if !ok {
-			return fmt.Errorf("Error loading CA Path: Couldn't parse PEM in: %s", path)
+		if pool.AppendCertsFromPEM(pem) {
+			certsLoaded++
 		}
 
 		return nil
@@ -121,5 +121,10 @@ func LoadCAPath(caPath string) (*x509.CertPool, error) {
 		return nil, err
 	}
 
+	if certsLoaded == 0 {
+		return nil, fmt.Errorf("Error loading CA Path: Couldn't parse PEM in: %s", caPath)
+	}
+
 	return pool, nil
 }
+
