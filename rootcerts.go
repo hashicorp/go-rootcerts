@@ -103,6 +103,19 @@ func LoadCAPath(caPath string) (*x509.CertPool, error) {
 			return nil
 		}
 
+		// Walk uses Lstat, so a symlink to a directory is not a directory.
+		// Kubernetes secret mounts include a ..data symlink to the current
+		// data directory. Reading that entry fails and aborts the walk.
+		if info.Mode()&os.ModeSymlink != 0 {
+			target, err := os.Stat(path)
+			if err != nil {
+				return fmt.Errorf("Error loading file from CAPath: %s", err)
+			}
+			if target.IsDir() {
+				return nil
+			}
+		}
+
 		pem, err := os.ReadFile(path)
 		if err != nil {
 			return fmt.Errorf("Error loading file from CAPath: %s", err)
