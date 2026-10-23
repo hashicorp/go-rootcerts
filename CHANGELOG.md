@@ -11,7 +11,7 @@
 ## v1.1.0 (2026-10-23)
 
 ### Changes
-- Minimum Go version raised from 1.12 to 1.26 (go.mod). Consumers on Go 1.25 or older must upgrade.
+- Minimum Go version raised from 1.12 to 1.26 (go.mod).
 - Added copyright and license headers.
 - CI: Go 1.26.10 toolchain, golangci-lint v2.14.0, GitHub Actions updates.
 
