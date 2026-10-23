@@ -6,7 +6,7 @@ sudo: false
 language: go
 
 go:
-  - "1.27"
+  - "1.26"
 
 branches:
   only:
