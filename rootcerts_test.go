@@ -69,6 +69,38 @@ func TestLoadCACertsFromDirWithSymlinks(t *testing.T) {
 	testCertLoaded(t, p)
 }
 
+func TestLoadCAPathSkipsSymlinkToDirectory(t *testing.T) {
+	dir := t.TempDir()
+	data := filepath.Join(dir, "data")
+	if err := os.Mkdir(data, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	pem, err := os.ReadFile(testFixture("capath", "securetrust.pem"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(data, "securetrust.pem"), pem, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	// Kubernetes secret mounts include a ..data symlink to the current
+	// data directory alongside the certificate files.
+	if err := os.Symlink("data", filepath.Join(dir, "..data")); err != nil {
+		t.Fatal(err)
+	}
+
+	p, err := LoadCAPath(dir)
+	if err != nil {
+		t.Fatalf("LoadCAPath: %s", err)
+	}
+	want := x509.NewCertPool()
+	if !want.AppendCertsFromPEM(pem) {
+		t.Fatal("fixture PEM did not parse")
+	}
+	if len(p.Subjects()) != len(want.Subjects()) {
+		t.Fatalf("got %d certs, want %d", len(p.Subjects()), len(want.Subjects()))
+	}
+}
+
 func testFixture(n ...string) string {
 	parts := []string{fixturesDir}
 	parts = append(parts, n...)
